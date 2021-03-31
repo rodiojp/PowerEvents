@@ -14,6 +14,8 @@ using PowerEvents.Domain.Windows;
 using System.Timers;
 using PowerEvents.WindowsInput;
 using PowerEvents.WindowsInput.Native;
+using Microsoft.Win32;
+using PowerEvents.Domain;
 
 namespace PowerEvents.WinForm
 {
@@ -74,7 +76,54 @@ namespace PowerEvents.WinForm
             StayOnTop();
             SetVideoMode();
             EstablishTimer();
+            CheckAutoStart();
         }
+
+        private void CheckAutoStart()
+        {
+            string valueNameExePath = Application.ExecutablePath;
+            RegistryKey reg = Registry.CurrentUser.OpenSubKey(SystemConstants.REG_SUB_KEY_NAME);
+            object value = reg.GetValue(SystemConstants.REG_MAIN_APP_KEY_NAME);
+            bool bCheck = value != null;
+            if (bCheck && value.GetType().Name == "String")
+            {
+                bCheck = valueNameExePath.Equals(value);
+            }
+            miAutoStart.Checked = bCheck;
+        }
+
+        private void miAutoStart_Click(object sender, EventArgs e)
+        {
+            //The second parameter should be set to true if you need write access to the key
+            RegistryKey reg = Registry.CurrentUser.OpenSubKey(SystemConstants.REG_SUB_KEY_NAME, true);
+            if (!miAutoStart.Checked)
+            {
+                string valueNameExePath = Application.ExecutablePath;
+                try
+                {
+                    reg.SetValue(SystemConstants.REG_MAIN_APP_KEY_NAME, valueNameExePath);
+                    reg.Close();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToLogString());
+                }
+            }
+            else
+            {
+                try
+                {
+                    reg.DeleteValue(SystemConstants.REG_MAIN_APP_KEY_NAME);
+                    reg.Close();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToLogString());
+                }
+            }
+            CheckAutoStart();
+        }
+
         /// <summary>
         /// Initialize the timer for the first time then inside of m_waitableTimer_OnTimerCompleted()
         /// </summary>
@@ -164,5 +213,6 @@ namespace PowerEvents.WinForm
             ExecutionState videoFlags = ExecutionState.ES_CONTINUOUS | ExecutionState.ES_DISPLAY_REQUIRED;
             Kernel32.SetThreadExecutionState(videoFlags);
         }
+
     }
 }
