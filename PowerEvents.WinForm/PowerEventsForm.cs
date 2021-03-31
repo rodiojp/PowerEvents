@@ -11,6 +11,9 @@ using System.Configuration;
 using log4net;
 using PowerEvents.Domain.Extensions;
 using PowerEvents.Domain.Windows;
+using System.Timers;
+using PowerEvents.WindowsInput;
+using PowerEvents.WindowsInput.Native;
 
 namespace PowerEvents.WinForm
 {
@@ -18,9 +21,14 @@ namespace PowerEvents.WinForm
     {
         //Log4Net logger
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
+        private const int NoUserTimerCounterDefault = 0;
         public int WindowWidth { get; private set; } = 27; //32 for Windows 7
         public int WindowHeight { get; private set; } = 24; //24 for Windows 7
+        public System.Timers.Timer PowerTimer { get; private set; }
+        public double TimerInterval { get; private set; } = 20 * 1000; // (60+55)*1000; // sec
+        public int NoUserTimerCounter { get; private set; } = NoUserTimerCounterDefault;
+        public bool CursorMoved { get; private set; }
+        public MouseCursorPoint LastCursorPosition { get; private set; }
 
         public PowerEventsForm()
         {
@@ -38,7 +46,7 @@ namespace PowerEvents.WinForm
                 int intWindowWidth = Convert.ToInt32(strWindowWidth);
                 string strWindowHeight = appSettings["WindowHeight"];
                 int intWindowHeight = Convert.ToInt32(strWindowHeight);
-                if (intWindowWidth>0 && intWindowWidth<100 &&
+                if (intWindowWidth > 0 && intWindowWidth < 100 &&
                     intWindowHeight > 0 && intWindowHeight < 100)
                 {
                     WindowWidth = intWindowWidth;
@@ -65,7 +73,81 @@ namespace PowerEvents.WinForm
 
             StayOnTop();
             SetVideoMode();
+            EstablishTimer();
         }
+        /// <summary>
+        /// Initialize the timer for the first time then inside of m_waitableTimer_OnTimerCompleted()
+        /// </summary>
+        private void EstablishTimer()
+        {
+            PowerTimer = new System.Timers.Timer();
+            PowerTimer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimerEvent);
+            PowerTimer.Interval = TimerInterval;
+            PowerTimer.Enabled = true;
+            Log.InfoFormat("Try to set Timer @ {0:yyyy/MM/dd HH:mm:ss} for Interval {1}; first OnTimeEvent @ {2:yyyy/MM/dd HH:mm:ss}",
+                DateTime.Now, TimerInterval, DateTime.Now.AddMilliseconds(TimerInterval));
+        }
+        /// <summary>
+        /// Specify what you want to happen when the Elapsed event is raised
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTimerEvent(object sender, ElapsedEventArgs e)
+        {
+            Log.InfoFormat("OnTime @ {0:yyyy/MM/dd HH:mm:ss} for Interval {1}; next OnTimeEvent @ {2:yyyy/MM/dd HH:mm:ss}",
+                DateTime.Now, NoUserTimerCounter, DateTime.Now.AddMilliseconds(TimerInterval));
+            CursorMoved = CheckIfCursorMoved();
+            if (!CursorMoved)
+            {
+                NoUserTimerCounter++;
+                ThereIsNoUser();
+            }
+            else
+            {
+                NoUserTimerCounter = NoUserTimerCounterDefault;
+                Log.Info("There is a User");
+            }
+        }
+
+        private void MouseMovePointerRelative(int dx, int dy)
+        {
+            Log.Info("Mouse Move Pointer Relative");
+            InputSimulator sim = new InputSimulator();
+            sim.Mouse
+                .MoveMouseBy(dx, dy)
+                .Sleep(1000)
+                .MoveMouseBy(-dx, -dy);
+        }
+
+        private bool CheckIfCursorMoved()
+        {
+            bool sucess = User32.GetCursorPos(out MouseCursorPoint lpPoint);
+            bool moved = !LastCursorPosition.Equals(lpPoint);
+            LastCursorPosition = lpPoint;
+            return moved;
+        }
+
+        private void ThereIsNoUser()
+        {
+            Log.Info("There is no User");
+            if (NoUserTimerCounter % 15 == 0)
+            {
+                PressWindowsKey();
+                MouseMovePointerRelative(100, 100);
+                CheckIfCursorMoved();
+            }
+        }
+
+        private void PressWindowsKey()
+        {
+            Log.Info("Pressed Windows Key");
+            InputSimulator sim = new InputSimulator();
+            sim.Keyboard
+                .KeyPress(VirtualKeyCode.LWIN)
+                .Sleep(1000)
+                .KeyPress(VirtualKeyCode.LWIN);
+        }
+
         /// <summary>
         /// Stay on Top
         /// </summary>

@@ -93,6 +93,10 @@
       <Project>{951ca84d-c816-4dca-9832-d4de5c51a540}</Project>
       <Name>PowerEvents.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PowerEvents.WindowsInput\PowerEvents.WindowsInput.csproj">
+      <Project>{2c6d4066-d880-4609-998f-f1cc01569141}</Project>
+      <Name>PowerEvents.WindowsInput</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

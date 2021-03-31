@@ -12,10 +12,66 @@ namespace PowerEvents.Domain.Windows
         public static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, WindowPositionFlags uFlags);
+        /// <summary>
+        /// Retrieves the cursor's position, in screen coordinates.
+        /// </summary>
+        /// <param name="lpPoint"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern bool GetCursorPos(out MouseCursorPoint lpPoint);
     }
+    public struct MouseCursorPoint
+    {
+        public int x;
+        public int y;
+        public MouseCursorPoint(int x1, int y1)
+        {
+            x = x1;
+            y = y1;
+        }
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MouseInput
+    {
+        public MouseCursorPoint pt;
 
+        public uint mouseData;
+        public uint flags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct HardwareInput
+    {
+        public uint uMsg;
+        public ushort wParamL;
+        public ushort wParamH;
+
+    }
+    public struct KeyboardInput
+    {
+        public ushort wVk;
+        public ushort wScan;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Input
+    {
+        [FieldOffset(0)]
+        public uint type;
+        [FieldOffset(4)]
+        public MouseInput mi;
+        [FieldOffset(4)]
+        public KeyboardInput ki;
+        [FieldOffset(4)]
+        public HardwareInput hi;
+
+    }
     /// <summary>
-    /// Window handles (HWND) used for hWndInsertAfter
+    /// Window handles(HWND) used for hWndInsertAfter
     /// </summary>
     public static class HWndInsertAfter
     {
