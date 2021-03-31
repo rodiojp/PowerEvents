@@ -214,5 +214,12 @@ namespace PowerEvents.WinForm
             Kernel32.SetThreadExecutionState(videoFlags);
         }
 
+        private void PowerEventsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (PowerTimer != null)
+            {
+                PowerTimer.Enabled = false;
+            }
+        }
     }
 }
