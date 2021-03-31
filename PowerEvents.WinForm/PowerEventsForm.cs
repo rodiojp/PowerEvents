@@ -16,5 +16,10 @@ namespace PowerEvents.WinForm
         {
             InitializeComponent();
         }
+
+        private void miExit_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }

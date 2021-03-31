@@ -29,8 +29,44 @@ namespace PowerEvents.WinForm
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PowerEventsForm));
+            this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
+            this.miPE = new System.Windows.Forms.MenuItem();
+            this.miAutoStart = new System.Windows.Forms.MenuItem();
+            this.menuItem3 = new System.Windows.Forms.MenuItem();
+            this.miExit = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
+            // 
+            // mainMenu1
+            // 
+            this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.miPE});
+            // 
+            // miPE
+            // 
+            this.miPE.Index = 0;
+            this.miPE.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.miAutoStart,
+            this.menuItem3,
+            this.miExit});
+            this.miPE.Text = "&PE";
+            // 
+            // miAutoStart
+            // 
+            this.miAutoStart.Index = 0;
+            this.miAutoStart.Text = "&Auto Start";
+            // 
+            // menuItem3
+            // 
+            this.menuItem3.Index = 1;
+            this.menuItem3.Text = "-";
+            // 
+            // miExit
+            // 
+            this.miExit.Index = 2;
+            this.miExit.Text = "E&xit";
+            this.miExit.Click += new System.EventHandler(this.miExit_Click);
             // 
             // PowerEventsForm
             // 
@@ -38,6 +74,7 @@ namespace PowerEvents.WinForm
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Menu = this.mainMenu1;
             this.Name = "PowerEventsForm";
             this.Text = "PowerEventsForm";
             this.ResumeLayout(false);
@@ -45,5 +82,11 @@ namespace PowerEvents.WinForm
         }
 
         #endregion
+
+        private System.Windows.Forms.MainMenu mainMenu1;
+        private System.Windows.Forms.MenuItem miPE;
+        private System.Windows.Forms.MenuItem miAutoStart;
+        private System.Windows.Forms.MenuItem menuItem3;
+        private System.Windows.Forms.MenuItem miExit;
     }
 }
