@@ -38,6 +38,8 @@
   <ItemGroup />
   <ItemGroup>
     <Compile Include="Extensions\ExceptionExtensions.cs" />
+    <Compile Include="Windows\Kernel32.cs" />
+    <Compile Include="Windows\User32.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
