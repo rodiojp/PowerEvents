@@ -164,7 +164,6 @@ namespace PowerEvents.WinForm
             InputSimulator sim = new InputSimulator();
             sim.Mouse
                 .MoveMouseBy(dx, dy)
-                .Sleep(1000)
                 .MoveMouseBy(-dx, -dy);
         }
 
@@ -182,7 +181,7 @@ namespace PowerEvents.WinForm
             if (NoUserTimerCounter % 15 == 0)
             {
                 PressWindowsKey();
-                MouseMovePointerRelative(100, 100);
+                MouseMovePointerRelative(1, 1);
                 CheckIfCursorMoved();
             }
         }
