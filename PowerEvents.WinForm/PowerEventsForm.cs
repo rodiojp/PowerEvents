@@ -40,7 +40,7 @@ namespace PowerEvents.WinForm
 
         private void ReadSettings()
         {
-            //Log.Error(new Exception("Test").ToLogString());
+            //Log.Error(new Exception("Start Application"));
             try
             {
                 System.Collections.Specialized.NameValueCollection appSettings = ConfigurationManager.AppSettings;
@@ -181,6 +181,11 @@ namespace PowerEvents.WinForm
             if (NoUserTimerCounter % 15 == 0)
             {
                 PressWindowsKey();
+                MouseMovePointerRelative(1, 1);
+                CheckIfCursorMoved();
+            }
+            else if (NoUserTimerCounter % 2 == 0)
+            {
                 MouseMovePointerRelative(1, 1);
                 CheckIfCursorMoved();
             }
